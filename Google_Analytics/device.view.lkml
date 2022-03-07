@@ -5,7 +5,7 @@
 
 
 view: device {
-  
+
 
   ########## DIMENSIONS ############
   dimension: browser {
@@ -13,7 +13,16 @@ view: device {
     group_label: "Technology"
     description: "The name of users' browsers, for example, Internet Explorer or Firefox."
     type: string
-    sql: ${TABLE}.device.browser ;;
+    sql:
+      CASE
+        WHEN
+          ${TABLE}.device.browser IN ("Chrome", "Safari", "Firefox", "Internet Explorer")
+          THEN ${TABLE}.device.browser
+        ELSE "Other"
+      END
+
+
+        ;;
 
     drill_fields: [browser_size, browser_version]
   }

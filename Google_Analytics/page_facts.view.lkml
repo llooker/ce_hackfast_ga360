@@ -27,7 +27,7 @@ view: page_facts {
       derived_column: current_page_plus_5 {sql: LEAD(page_path,5) OVER (PARTITION BY id ORDER BY hit_time) ;;}
       derived_column: current_page_plus_6 {sql: LEAD(page_path,6) OVER (PARTITION BY id ORDER BY hit_time) ;;}
       derived_column: cumulative_page_path {sql: STRING_AGG(page_path, " --> ") OVER (PARTITION BY id ORDER BY hit_time);;}
-      filters: [hits.type: "PAGE", ga_sessions.partition_date: "@{PDT_DATE_FILTER}"]
+      filters: [hits.type: "PAGE", ga_sessions.partition_date: "last 10 years"]
     }
     persist_for: "24 hours"
   }

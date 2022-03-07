@@ -8,21 +8,54 @@ include: "/**/device.view.lkml"
 include: "/**/calendar.view.lkml"
 include: "/Dashboards/custom_navigation_buttons.view.lkml"
 
-include: "partition_date.view.lkml"
-include: "session_goals.view.lkml"
-
 
 view: ga_sessions {
   view_label: "Session"
-  sql_table_name: `@{SCHEMA_NAME}.@{GA360_TABLE_NAME}` ;;
+  sql_table_name: `bigquery-public-data.google_analytics_sample.ga_sessions_*` ;;
   extends: [
     geonetwork,
     totals,
     traffic_source,
     device,
-    ga_sessions_partition_date,
-
+    custom_navigation_buttons
   ]
+
+
+  dimension_group: partition {
+    # Date that is parsed from the table name. Required as a filter to avoid accidental massive queries
+    label: ""
+    view_label: "Session"
+    description: "Date based on the day the session was added to the database. Matches date in Google Analytics UI, but may not match 'Session Start Date'."
+    type: time
+    timeframes: [
+      date,
+      day_of_week,
+      day_of_week_index,
+      day_of_month,
+      day_of_year,
+      fiscal_quarter,
+      fiscal_quarter_of_year,
+      week,
+      month,
+      month_name,
+      month_num,
+      quarter,
+      quarter_of_year,
+      week_of_year,
+      year
+    ]
+    sql: TIMESTAMP(
+              PARSE_DATE(
+                '%Y%m%d'
+                  , REGEXP_EXTRACT(
+                    _TABLE_SUFFIX
+                      , r'^\d\d\d\d\d\d\d\d'
+                  )
+              )
+            );;
+    convert_tz: no
+  }
+
 
   ########## PRIMARY KEYS ##########
 
@@ -229,7 +262,7 @@ view: ga_sessions {
 
   dimension: partition_date_filter {
     type: string
-    sql: CONCAT('This data is from the ','@{PDT_DATE_FILTER} ') ;;
+    sql: CONCAT('This data is from the ','last 10 years ') ;;
     hidden: no
     html:  <a style="background: #FFF;float: center; padding:15px; font-weight: bold;font-size: 30%;">{{value}}  </a></strong>
    ;;

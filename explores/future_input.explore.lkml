@@ -1,6 +1,5 @@
 include: "/*/*.view.lkml"
 include: "/Google_Analytics/*.view.lkml"
-include: "/Google_Analytics/Sessions/*.view.lkml"
 
 explore: future_input {
   view_label: "Audience Traits"
