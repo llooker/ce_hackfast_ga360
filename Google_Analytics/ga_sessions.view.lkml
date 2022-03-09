@@ -5,7 +5,6 @@ include: "/**/geonetwork.view.lkml"
 include: "/**/totals.view.lkml"
 include: "/**/traffic_source.view.lkml"
 include: "/**/device.view.lkml"
-include: "/**/calendar.view.lkml"
 include: "/Dashboards/custom_navigation_buttons.view.lkml"
 
 
