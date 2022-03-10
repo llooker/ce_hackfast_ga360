@@ -10,14 +10,13 @@ include: "/**/user_facts.view"
 
 view: training_input {
   extends: [user_facts]
- ## Uses the SQL from the user facts table and dynamically updates the date range to look 900 days back for 360 days as our training dataset
   derived_table: {
     sql_trigger_value: SELECT CURRENT_DATE() ;;
     sql:
 {% assign x  = "${EXTENDED}" %}
-    {% assign updated_start_sql = x | replace: 'DAYS_BACK',"390"   %}
+    {% assign updated_start_sql = x | replace: 'START_DAY',"'2016-08-01'"   %}
     /*updated_start_date*/
-    {% assign updated_sql = updated_start_sql  | replace: 'DAYS_FROM',"360"  %}
+    {% assign updated_sql = updated_start_sql  | replace: 'END_DAY',"'2017-05-31'"  %}
      /*updated_end_date*/
     {{updated_sql}}
     ;;
@@ -29,13 +28,12 @@ view: training_input {
 
 view: testing_input {
   extends: [user_facts]
-  ## Uses the SQL from the user facts table and dynamically updates the date range to look 900 days back for 360 days as our training dataset
   derived_table: {
     sql_trigger_value: SELECT CURRENT_DATE() ;;
     sql: {% assign x  = "${EXTENDED}" %}
-     {% assign updated_start_sql = x | replace: 'DAYS_BACK',"390"   %}
+     {% assign updated_start_sql = x | replace: 'START_DAY',"'2017-06-01'"   %}
     /*updated_start_date*/
-    {% assign updated_sql = updated_start_sql  | replace: 'DAYS_FROM',"360"  %}
+    {% assign updated_sql = updated_start_sql  | replace: 'END_DAY',"'2017-06-30'"  %}
      /*updated_end_date*/
     {{updated_sql}}
      ;;
@@ -56,7 +54,7 @@ view: future_purchase_model {
     --, CLASS_WEIGHTS=[('1',1), ('0',0.05)] -- Consider adding class weights or downsampling if you have imbalanced classes
     ) AS
     SELECT
-    * EXCEPT(clientId)
+    * EXCEPT(fullvisitorId)
     FROM ${training_input.SQL_TABLE_NAME};;
   }
 }
@@ -166,9 +164,9 @@ view: future_input {
   derived_table: {
     sql_trigger_value: SELECT CURRENT_DATE() ;;
     sql: {% assign x  = "${EXTENDED}" %}
-    {% assign updated_start_sql = x | replace: 'DAYS_BACK',"30"   %}
+    {% assign updated_start_sql = x | replace: 'START_DAY', "'2017-07-01'" %}
     /*updated_start_date*/
-    {% assign updated_sql = updated_start_sql  | replace: 'DAYS_FROM',"31"  %}
+    {% assign updated_sql = updated_start_sql  | replace: 'END_DAY',"'2017-07-31'"  %}
     /*updated_end_date*/
     {{updated_sql}}
     ;;
@@ -202,7 +200,7 @@ view: future_input {
 
   dimension: client_id {
     type: string
-    sql: ${TABLE}.clientId ;;
+    sql: ${TABLE}.fullvisitorID ;;
     primary_key: yes
   }
 
@@ -348,7 +346,7 @@ view: future_input {
 
 view: future_purchase_prediction {
   derived_table: {
-    sql: SELECT clientId,
+    sql: SELECT fullvisitorId,
           pred.prob as user_propensity_score,
           NTILE(10) OVER (ORDER BY pred.prob DESC) as user_propensity_decile
         FROM ml.PREDICT(
@@ -371,7 +369,7 @@ view: future_purchase_prediction {
   dimension: clientId {
     type: string
     hidden: yes
-    sql: TRIM(REPLACE(${TABLE}.clientId,',','')) ;;
+    sql: TRIM(REPLACE(${TABLE}.fullvisitorId,',','')) ;;
   }
 
   measure: average_user_propensity_score {
