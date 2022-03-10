@@ -1,5 +1,4 @@
 include: "/*/*.view.lkml"
-include: "/Google_Analytics/*.view.lkml"
 
 explore: ga_sessions {
   label: "Google Analytics Sessions"

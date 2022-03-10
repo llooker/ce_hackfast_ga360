@@ -2,7 +2,6 @@ connection: "looker-private-demo"
 
 # include: "/datagroups.lkml"
 include: "/*/*.view.lkml"
-include: "/Google_Analytics/*.view.lkml"
 # include: "/Google_Analytics/Custom_Views/*.view.lkml"
 include: "/Dashboards/*.dashboard"
 include: "/explores/*.explore.lkml"
