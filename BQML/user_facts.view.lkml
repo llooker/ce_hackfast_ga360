@@ -10,7 +10,8 @@ view: user_facts {
     sql:
         --Limiting the table scans to the date ranges identified in the predictions table
         WITH filtered_base AS (
-        SELECT * FROM `bigquery-public-data.google_analytics_sample.ga_sessions_*`
+        SELECT *, visitorID as clientID. --- note: the clientID column isn't populated in this dataset, so we're using the visitorid instead
+        FROM `bigquery-public-data.google_analytics_sample.ga_sessions_*`
         WHERE TIMESTAMP(PARSE_DATE('%Y%m%d', REGEXP_EXTRACT(_TABLE_SUFFIX,r'\d\d\d\d\d\d\d\d')))  BETWEEN START_DAY AND END_DAY),
       -- labeling customers who have made a purchase as a 1 and customers who have not made a purchas as a 0
     user_label AS (
