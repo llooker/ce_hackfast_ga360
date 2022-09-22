@@ -11,7 +11,7 @@ include: "/**/user_facts.view"
 view: training_input {
   extends: [user_facts]
   derived_table: {
-    sql_trigger_value: SELECT CURRENT_DATE() ;;
+    sql_trigger_value: SELECT MONTH(CURRENT_DATE()) ;;
     sql:
 {% assign x  = "${EXTENDED}" %}
     {% assign updated_start_sql = x | replace: 'START_DAY',"'2016-08-01'"   %}
@@ -29,7 +29,7 @@ view: training_input {
 view: testing_input {
   extends: [user_facts]
   derived_table: {
-    sql_trigger_value: SELECT CURRENT_DATE() ;;
+    sql_trigger_value: SELECT MONTH(CURRENT_DATE()) ;;
     sql: {% assign x  = "${EXTENDED}" %}
      {% assign updated_start_sql = x | replace: 'START_DAY',"'2017-06-01'"   %}
     /*updated_start_date*/
@@ -162,7 +162,7 @@ view: future_purchase_model_training_info {
 view: future_input {
   extends: [user_facts]
   derived_table: {
-    sql_trigger_value: SELECT CURRENT_DATE() ;;
+    sql_trigger_value: SELECT MONTH(CURRENT_DATE()) ;;
     sql: {% assign x  = "${EXTENDED}" %}
     {% assign updated_start_sql = x | replace: 'START_DAY', "'2017-07-01'" %}
     /*updated_start_date*/
