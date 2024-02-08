@@ -11,7 +11,8 @@ include: "/**/user_facts.view"
 view: training_input {
   extends: [user_facts]
   derived_table: {
-    sql_trigger_value: SELECT MONTH(CURRENT_DATE()) ;;
+    # Victor Poiesz 02/08/2024 -- Removing persistence to avoid broken PDT regenation
+    #sql_trigger_value: SELECT MONTH(CURRENT_DATE()) ;;
     sql:
 {% assign x  = "${EXTENDED}" %}
     {% assign updated_start_sql = x | replace: 'START_DAY',"'2016-08-01'"   %}
@@ -29,7 +30,8 @@ view: training_input {
 view: testing_input {
   extends: [user_facts]
   derived_table: {
-    sql_trigger_value: SELECT MONTH(CURRENT_DATE()) ;;
+    # Victor Poiesz 02/08/2024 -- Removing persistence to avoid broken PDT regenation
+    #sql_trigger_value: SELECT MONTH(CURRENT_DATE()) ;;
     sql: {% assign x  = "${EXTENDED}" %}
      {% assign updated_start_sql = x | replace: 'START_DAY',"'2017-06-01'"   %}
     /*updated_start_date*/
@@ -43,19 +45,22 @@ view: testing_input {
 
 view: future_purchase_model {
   derived_table: {
-    datagroup_trigger: bqml_datagroup
+    # Victor Poiesz 02/08/2024 -- Removing persistence to avoid broken PDT regenation
+    #datagroup_trigger: bqml_datagroup
+    persist_for: "1 hour"
     sql_create:
-    CREATE OR REPLACE MODEL ${SQL_TABLE_NAME}
-    OPTIONS(model_type='logistic_reg'
-    , labels=['label']
-    , L1_REG = 1
-    , DATA_SPLIT_METHOD = 'RANDOM'
-    , DATA_SPLIT_EVAL_FRACTION = 0.20
-    --, CLASS_WEIGHTS=[('1',1), ('0',0.05)] -- Consider adding class weights or downsampling if you have imbalanced classes
-    ) AS
-    SELECT
-    * EXCEPT(fullvisitorId)
-    FROM ${training_input.SQL_TABLE_NAME};;
+      CREATE OR REPLACE MODEL ${SQL_TABLE_NAME}
+      OPTIONS(model_type='logistic_reg'
+      , labels=['label']
+      , L1_REG = 1
+      , DATA_SPLIT_METHOD = 'RANDOM'
+      , DATA_SPLIT_EVAL_FRACTION = 0.20
+      --, CLASS_WEIGHTS=[('1',1), ('0',0.05)] -- Consider adding class weights or downsampling if you have imbalanced classes
+      ) AS
+      SELECT
+      * EXCEPT(fullvisitorId)
+      FROM ${training_input.SQL_TABLE_NAME}
+    ;;
   }
 }
 
@@ -162,7 +167,8 @@ view: future_purchase_model_training_info {
 view: future_input {
   extends: [user_facts]
   derived_table: {
-    sql_trigger_value: SELECT MONTH(CURRENT_DATE()) ;;
+    # Victor Poiesz 02/08/2024 -- Removing persistence to avoid broken PDT regenation
+    #sql_trigger_value: SELECT MONTH(CURRENT_DATE()) ;;
     sql: {% assign x  = "${EXTENDED}" %}
     {% assign updated_start_sql = x | replace: 'START_DAY', "'2017-07-01'" %}
     /*updated_start_date*/
